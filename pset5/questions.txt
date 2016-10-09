@@ -1,0 +1,83 @@
+0.  What is pneumonoultramicroscopicsilicovolcanoconiosis?
+
+The largest word in dictionary/large is pneumonoultramicroscopicsilicovolcanoconiosis, a 45 character word. 
+
+1. According to its man page, what does getrusage do?
+
+getrusage takes two arguments, an int who and a pointer to a structure of type rusage. Int who can take a
+few different values, RUSAGE_SELF, RUSAGE_CHILDREN, and RUSAGE_THREAD. RUSAGE_SELF returns resource usage 
+for the calling process... i.e. the sum of resources used by all threads in the process.
+RUSAGE_CHILDREN returns rusage stats of all children of the calling process, and RUSAGE_THREAD returns rusage 
+stats stored in the struct pointed to by usage.
+
+If getrusage is successful, the program will return 0. Else, it will return -1. 
+
+2. Per that same man page, how many members are in a variable of type struct rusage?
+
+Fourteen long type variables and two structures. 
+
+3. Why do you think we pass before and after by reference (instead of by value) to calculate, even though we’re not changing their contents?
+
+When you pass by value you create a copy of the variable to the function. Considering how structures can grow very large in size,
+calculate uses pass by reference for struct rusage to be efficient in memory usage. 
+
+4. Explain as precisely as possible, in a paragraph or more, how main goes about reading words from a file. In other words, convince us that you indeed understand how that function’s for loop works.
+
+First of all the loop will continue until the char c obtained from fgetc(fp) is equal to EOF.
+
+fgetc increments the stream pointer by a char everytime it returns. Thus the increment is the same operation c = fgetc(fp);
+Once you get a char, there are three possibilities. If it's an alphabetical character or its a backslash or apostrophe and above index 0,
+then the first if executes and the char c is added to char word[index], as element index. Once this is done, index is incremented.
+If index is above 45 , fgetc executes in a continuous while loop as long as c is not the EOF and is alphabetical. In other words,
+fgetc will iterate through all alphabetical characters in that string (moving pointer to stream forward). If this part executes,
+then after fgetc consumes the rest of the alphabetical string it will reset index to 0. 
+
+The second possibility executes if c is a digit. If so, a while loop will run while character returns an 
+alphanumerical value. (i.e. isdigit(c) or isalpha(c) return true.) After the bogus string has been consumed, index is reset to 0.
+
+The third possibility is if index > 0 and thus a word was actually found. (c has reached a space after adding chars to word[index])
+If this condition executes, word[index] is intialized as \0 to signal end of the word, and word count is incremented.
+Following this, the words spelling is checked and time_check is calculated. If word is misspelled, misspelled word is
+printed and misspelled words count is incremented.
+
+5. Why do you think we used fgetc to read each word’s characters one at a time rather than use fscanf with a format string like "%s" to read whole words at a time? Put another way, what problems might arise by relying on fscanf alone?
+
+fscanf returns the string in a format specified by the user, but we don't know what the inputs are going to be. We might
+be given input from stream that is a character then an integer. If we specified to fscanf and store in a %s, problems will occur.
+
+6. Why do you think we declared the parameters for check and load as const?
+
+So that if the program tries to alter the value pointed to by word or dictionary the compiler will notice and yell at you.
+Constant pointers to a variable (not the same thing as above) are useful for storage that can be changed in value but not moved in memory.
+Likewise a constant pointer to a constant variable means that the compiler will yell at you if the value in memory is trying to be changed. 
+
+7. What data structure(s) did you use to implement your spell-checker? Be sure not to leave your answer at just "hash table," "trie," or the like. Expound on what’s inside each of your "nodes."
+
+I use a trie data structure, typedefined as 'node'. Each node contained a 27 element array of pointers to a struct type node.
+Each node also has a variable type bool named 'is_word'. If you were to have a word "bat" and represent it using nodes,
+you would represent 'b' as a ASCII  int value. You would then calloc a node at children[key]. If successful, you have a 
+copy pointer that shifts to set your position at the new node just allocated. You then find the key for 'a', which is int value 0.
+You then calloc a node for children[0]. Repeat the process, 't' is int value 19 in the children array.
+When you reach a '\n' value in the dictionary, you know that that represents the end of a word. Your copy pointer should now
+be pointing at the node just calloc'd at children[19]. That node itself has no children pointers that point at anything but NULL.
+You set the is_word value of that node to 'true'. You now have "bat" stored in nodes.
+
+8. How slow was your code the first time you got it working correctly?
+
+Well... I had a functional test that printed out the values i stored (in terminal), that took a while to run because
+printf had to run. Probably like 20 seconds. When I finally swapped to trying to see if speller actually ran it
+ran really fast. Mostly because it seg faulted immediately. 
+
+9. What kinds of changes, if any, did you make to your code in order to improve its performance?
+
+I tried to implement a hash table after getting disheartened at my trie structure failing to compile.
+It was important for me to make another program that didn't run alongside speller, because it was hard for me 
+to check if 'load' or 'check' actually worked. That being said, the code in speller that adds the sentinel value
+'\0' to the end of words found in memory helped me check my check function better than my alternative test program.
+
+Unload... Well it had to be recursive. I didn't really make any major changes to optimize run time.
+Trie loading was always going to take the most time out of all my functions. I could probably need to optimize check as it should be constant time.
+
+10. Do you feel that your code has any bottlenecks that you were not able to chip away at?
+
+Yeah. Load is not really going to get much faster I feel. Same with unload, it's necessary to check all the children nodes. 

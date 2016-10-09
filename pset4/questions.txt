@@ -1,0 +1,108 @@
+0.  How many different colors does each format support?
+
+BMP can support both indexed and direct palettes, therefore it can range from the standard 256 to thousands. 
+GIF format files can only support 256 colours as it's palette is indexed only.
+JPEG files have a direct palette therefore there are thousands of colours.
+PNG has both indexed and direct palettes. PNG-8 is indexed (256 colours), and PNG-24 is direct (thousands).
+
+1.  Which of the formats supports animation?
+
+GIF format files support animation. Commonly used in webpages.
+
+2.  What’s the difference between lossy and lossless compression?
+
+Lossy compression results in a loss of data every save as some information is discarded during compression. 
+This results in a smaller file size but continuous resaving will result in a decrement in image quality.
+Lossless compression encodes all information and does not discard any information. Continuous saves will not compromise image quality.
+The file size will be larger.
+
+3.  Which of these formats is lossy-compressed?
+
+JPEG files are lossy-compressed, thus resaving in this format will gradually result in a loss of image quality.
+
+4.  What happens, technically speaking, when a file is deleted on a FAT file system?
+
+FAT stands for File Allocation Table. A hard disk is composed of 512 byte sectors. The FAT system -->
+will further group these sectors into clusters. These clusters are an entry in the FAT system.
+These entries describe what the cluster is, which is either a: 
+1. Part of a file, pointing to the next cluster which is also part of a file.
+2. The last cluster of a file, with a specific End-of-file (EOF) value. (Like \0 for *char)
+3. Free space, with a NUL value. (0)
+When a file is deleted on this system, the operating system will modify the first character in the files
+directory to signal deletion, which lets the system know that the directory entry can be recycled.
+Following this change to the pointer, the FAT clusters are moved to the hard drives list of free clusters.
+The actual hard disk data is unchanged, just moved. 
+
+5.  What can someone like you do to ensure (with high probability) that files you delete cannot be recovered?
+
+There are free programs available online that can overwrite or erase data (via placing NUL values) in your hard disk.
+Generally levels 0-4 of information can be securely sanitized. The CIA can probably still get your info unless you physically destroy it however.
+
+6. What’s stdint.h?
+
+A header file in C that specifies various signed and unsigned int types with exact widths for the size of the variable. 
+
+7. What’s the point of using uint8_t, uint32_t, int32_t, and uint16_t in a program?
+
+uint8_t specifies that it is an unsigned int variable that can hold 8 bits of info. Unsigned ints can hold larger values than signed ints,
+although they can only be positive values. The same goes for the other variables, they hold a specific amount of data. 
+
+8. How many bytes is a BYTE, a DWORD, a LONG, and a WORD, respectively?
+
+A BYTE is one byte, a DWORD is 4 bytes, a LONG is 4 bytes, and a WORD is 2 bytes.
+
+9. What (in ASCII, decimal, or hexadecimal) must the first two bytes of any BMP file be? (Leading bytes used to identify file formats (with high probability) are generally called "magic numbers.)"
+
+The two bytes should be 0x4d and 0x42, standing for M and B respectively. It's done in a little-endian way of writing, 
+so that's why it's back to front.
+
+10. What’s the difference between bfSize and biSize?
+
+biSize is the size required by the header file BITMAPINFOHEADER, which is 40 bytes.
+bfSize is the size, in bytes, of the bitmap file(including headers). 
+
+11. What does it mean if biHeight is negative?
+
+If biHeight is negative , it means that the image is an uncompressed RGB bitmap, and it's a top down Device Independent Bitmap. 
+
+12. What field in BITMAPINFOHEADER specifies the BMP’s color depth (i.e., bits per pixel)?
+
+biBitCount is the value within the struct that specifies bpp. 
+
+13. Why might fopen return NULL in copy.c:37?
+
+If there is no space in memory to write to outfile. If FILE * outptr points to no memory. 
+
+14. Why is the third argument to fread always 1 in our code?
+
+Because when you fread the BITMAP header files, you only are reading one element of the size of the header. There aren't several headers of type BITMAP.
+When the program freads RGBTRIPLE's, it is per pixel, so there is only a need to fread 3 bytes worth of info, which is 1 element of RGBTRIPLE. 
+
+15. What value does copy.c:70 assign padding if bi.biWidth is 3?
+
+That would be (4 - (9) % 4) % 4, which is equal to 3 % 4, which is a value of 3. Therefore 3 bytes worth of padding are necessary.
+0x000000 of padding.
+
+16. What does fseek do?
+
+fseek takes three arguments and returns an int value. int fseek(FILE* stream, long offset, int whence);
+stream is the new file position in the file that will be pointed at. The new position, measured in bytes, is obtained -->
+through adding offset's value of bytes to the position set by whence. Whence will have either three values.
+SEEK_SET, SEEK_CUR, or SEEK_END. Set returns starting position of file, Cur sets the position as the current position in file, and end 
+sets the position to the end of the file. 
+
+17. What is SEEK_CUR?
+
+SEEK_CUR is the value for whence in fseek whereby offset bytes is added to the current position within the file, to get to new file position
+stream. 
+
+18. Whodunit? 
+
+Rick Astley. 
+
+
+do
+        {
+            fwrite(buffer, sizeof(buffer), 1, image);
+        }    
+        while (fread(&buffer, sizeof(buffer), 1, card) == 1);
